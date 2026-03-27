@@ -1,0 +1,1012 @@
+
+<style>
+  :root {
+    --purple-50: #EEEDFE; --purple-100: #CECBF6; --purple-600: #534AB7; --purple-800: #3C3489; --purple-900: #26215C;
+    --teal-50: #E1F5EE; --teal-100: #9FE1CB; --teal-600: #0F6E56; --teal-800: #085041;
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-600: #854F0B; --amber-800: #633806;
+    --coral-50: #FAECE7; --coral-100: #F5C4B3; --coral-600: #993C1D; --coral-800: #712B13;
+    --blue-50: #E6F1FB; --blue-100: #B5D4F4; --blue-600: #185FA5; --blue-800: #0C447C;
+    --green-50: #EAF3DE; --green-100: #C0DD97; --green-600: #3B6D11; --green-800: #27500A;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-600: #5F5E5A; --gray-800: #444441;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body { font-family: var(--font-sans, system-ui); background: transparent; }
+
+  .roadmap { padding: 1rem 0; }
+
+  .header { text-align: center; margin-bottom: 2rem; }
+  .header h1 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+  .header p { font-size: 14px; color: var(--color-text-secondary); }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.5rem; }
+  .tab { padding: 6px 14px; border-radius: var(--border-radius-md, 8px); border: 0.5px solid var(--color-border-secondary, #ccc); font-size: 13px; cursor: pointer; background: var(--color-background-primary); color: var(--color-text-secondary); transition: all 0.15s; }
+  .tab:hover { background: var(--color-background-secondary); }
+  .tab.active { background: var(--purple-50); border-color: var(--purple-600); color: var(--purple-800); font-weight: 500; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .phase-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+
+  .week-card {
+    border: 0.5px solid var(--color-border-tertiary, #e5e5e5);
+    border-radius: var(--border-radius-lg, 12px);
+    background: var(--color-background-primary);
+    overflow: hidden;
+  }
+
+  .week-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; cursor: pointer;
+    border-bottom: 0.5px solid var(--color-border-tertiary, #e5e5e5);
+    user-select: none;
+  }
+  .week-header:hover { background: var(--color-background-secondary); }
+
+  .week-badge {
+    font-size: 11px; font-weight: 500; padding: 3px 10px;
+    border-radius: 99px; white-space: nowrap;
+  }
+  .badge-purple { background: var(--purple-50); color: var(--purple-800); border: 0.5px solid var(--purple-100); }
+  .badge-teal { background: var(--teal-50); color: var(--teal-800); border: 0.5px solid var(--teal-100); }
+  .badge-amber { background: var(--amber-50); color: var(--amber-800); border: 0.5px solid var(--amber-100); }
+  .badge-coral { background: var(--coral-50); color: var(--coral-800); border: 0.5px solid var(--coral-100); }
+  .badge-blue { background: var(--blue-50); color: var(--blue-800); border: 0.5px solid var(--blue-100); }
+  .badge-green { background: var(--green-50); color: var(--green-800); border: 0.5px solid var(--green-100); }
+  .badge-gray { background: var(--gray-50); color: var(--gray-800); border: 0.5px solid var(--gray-100); }
+
+  .week-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); flex: 1; }
+  .week-toggle { font-size: 13px; color: var(--color-text-tertiary); transition: transform 0.2s; }
+  .week-toggle.open { transform: rotate(90deg); }
+
+  .week-body { padding: 16px; display: none; }
+  .week-body.open { display: block; }
+
+  .section-block { margin-bottom: 16px; }
+  .section-block:last-child { margin-bottom: 0; }
+
+  .section-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-secondary); margin-bottom: 8px; }
+
+  .item-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .item-list li { font-size: 13px; color: var(--color-text-primary); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+  .item-list li::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--color-text-tertiary); margin-top: 7px; flex-shrink: 0; }
+  .item-list li.check::before { content: ""; width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid var(--color-border-secondary); flex-shrink: 0; margin-top: 3px; }
+
+  .q-list { display: flex; flex-direction: column; gap: 6px; }
+  .q-item { font-size: 13px; color: var(--color-text-primary); background: var(--color-background-secondary); border-radius: var(--border-radius-md, 8px); padding: 8px 12px; line-height: 1.5; border-left: 2px solid var(--purple-600); }
+
+  .res-list { display: flex; flex-direction: column; gap: 4px; }
+  .res-item { font-size: 13px; color: var(--blue-600); cursor: pointer; text-decoration: underline; text-decoration-color: transparent; }
+  .res-item:hover { text-decoration-color: var(--blue-600); }
+
+  .highlight-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md, 8px); padding: 12px 14px; margin-bottom: 12px; border: 0.5px solid var(--color-border-tertiary); }
+  .highlight-box p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+  .highlight-box strong { color: var(--color-text-primary); font-weight: 500; }
+
+  .why-box { border-left: 3px solid var(--teal-600); padding: 8px 12px; background: var(--teal-50); border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; margin-bottom: 12px; }
+  .why-box p { font-size: 13px; color: var(--teal-800); line-height: 1.5; }
+
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 14px 0; }
+
+  .top50-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .top50-grid { grid-template-columns: 1fr; } }
+
+  .q50-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg, 12px); overflow: hidden; }
+  .q50-head { padding: 10px 14px; font-size: 13px; font-weight: 500; }
+  .q50-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 5px; }
+  .q50-item { font-size: 12px; color: var(--color-text-primary); display: flex; align-items: flex-start; gap: 6px; line-height: 1.5; }
+  .q50-num { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); min-width: 18px; }
+
+  .tip-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem; }
+  .tip-card { flex: 1; min-width: 200px; background: var(--color-background-secondary); border-radius: var(--border-radius-lg, 12px); padding: 14px 16px; border: 0.5px solid var(--color-border-tertiary); }
+  .tip-card h4 { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+  .tip-card ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .tip-card ul li { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; display: flex; gap: 6px; }
+  .tip-card ul li::before { content: "→"; color: var(--purple-600); }
+
+  .daily-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1rem; }
+  @media (max-width: 500px) { .daily-grid { grid-template-columns: 1fr; } }
+  .time-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px; }
+  .time-slot { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .time-activity { font-size: 13px; color: var(--color-text-primary); font-weight: 500; margin-bottom: 4px; }
+  .time-detail { font-size: 12px; color: var(--color-text-secondary); line-height: 1.4; }
+</style>
+
+<div class="roadmap">
+  <div class="header">
+    <h1>Java interview prep roadmap</h1>
+    <p>Mid-to-high level · 3 YoE · 8–15 LPA · 8-week structured plan</p>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-tab="overview">Overview</div>
+    <div class="tab" data-tab="core">Core Java</div>
+    <div class="tab" data-tab="spring">Spring Boot</div>
+    <div class="tab" data-tab="dsa">DSA</div>
+    <div class="tab" data-tab="sql">SQL & DB</div>
+    <div class="tab" data-tab="system">System Design</div>
+    <div class="tab" data-tab="lld">Low-Level Design</div>
+    <div class="tab" data-tab="projects">Projects & Resume</div>
+    <div class="tab" data-tab="top50">Top 50 Qs</div>
+    <div class="tab" data-tab="strategy">Strategy</div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="panel active" id="panel-overview">
+    <div class="highlight-box">
+      <p><strong>8-week plan · 2–3 hours/day · 5 days/week</strong><br>
+      Phase 1 (Wk 1–2): Core Java + DSA fundamentals · Phase 2 (Wk 3–4): Spring Boot + SQL · Phase 3 (Wk 5–6): System Design + LLD · Phase 4 (Wk 7–8): Projects + Mock Interviews</p>
+    </div>
+
+    <div class="phase-grid">
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-purple">Phase 1 · Weeks 1–2</span>
+          <span class="week-title">Foundation — Core Java + DSA</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="section-block">
+            <div class="section-label">Week 1 — Core Java</div>
+            <ul class="item-list">
+              <li class="check">OOP deep dive: polymorphism, abstraction, encapsulation (real-world use, not textbook)</li>
+              <li class="check">Collections: HashMap internals, ArrayList vs LinkedList, TreeMap, HashSet</li>
+              <li class="check">Multithreading: Thread lifecycle, synchronized, volatile, wait/notify</li>
+              <li class="check">Java 8+: Streams, Optional, Lambda, Functional interfaces, CompletableFuture</li>
+              <li class="check">Exception handling best practices, try-with-resources</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Week 2 — DSA Fundamentals</div>
+            <ul class="item-list">
+              <li class="check">Arrays, Strings, Two-pointer, Sliding window</li>
+              <li class="check">HashMap/HashSet patterns (frequency count, grouping)</li>
+              <li class="check">Stack and Queue (monotonic stack, BFS, DFS)</li>
+              <li class="check">Binary Search (standard + on answer space)</li>
+              <li class="check">Recursion & Backtracking basics</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-teal">Phase 2 · Weeks 3–4</span>
+          <span class="week-title">Spring Boot + SQL Mastery</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="section-block">
+            <div class="section-label">Week 3 — Spring Boot & Microservices</div>
+            <ul class="item-list">
+              <li class="check">Spring IOC, DI, Bean lifecycle, @Component vs @Service vs @Repository</li>
+              <li class="check">REST API design: request mapping, validation, exception handling</li>
+              <li class="check">Spring Security: JWT auth, filters, OAuth2 basics</li>
+              <li class="check">JPA/Hibernate: N+1 problem, lazy vs eager, query optimization</li>
+              <li class="check">Microservices: Feign, Eureka, API Gateway, circuit breaker</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Week 4 — SQL & Database</div>
+            <ul class="item-list">
+              <li class="check">Joins, subqueries, window functions (ROW_NUMBER, RANK, PARTITION BY)</li>
+              <li class="check">Indexes: types, when to use, composite index order, covering index</li>
+              <li class="check">Query optimization: EXPLAIN ANALYZE, slow query log</li>
+              <li class="check">Transactions: ACID, isolation levels, deadlocks</li>
+              <li class="check">Normalization, denormalization trade-offs</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-amber">Phase 3 · Weeks 5–6</span>
+          <span class="week-title">System Design + LLD</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="section-block">
+            <div class="section-label">Week 5 — System Design</div>
+            <ul class="item-list">
+              <li class="check">Scalability pillars: horizontal scaling, load balancing, caching</li>
+              <li class="check">Design URL shortener, rate limiter, notification system</li>
+              <li class="check">Database choices: SQL vs NoSQL, when to use Redis/Kafka</li>
+              <li class="check">CAP theorem, eventual consistency, sharding</li>
+              <li class="check">API design: REST vs gRPC, versioning, rate limiting</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Week 6 — Low-Level Design</div>
+            <ul class="item-list">
+              <li class="check">SOLID principles with Java code examples</li>
+              <li class="check">Design patterns: Singleton, Factory, Builder, Strategy, Observer</li>
+              <li class="check">Design a parking lot, library system, food delivery model</li>
+              <li class="check">UML class diagrams (basic)</li>
+              <li class="check">Code quality: naming, SRP in practice</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-coral">Phase 4 · Weeks 7–8</span>
+          <span class="week-title">Projects + Mock Interviews + HR</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="section-block">
+            <div class="section-label">Week 7 — Project polish + Resume</div>
+            <ul class="item-list">
+              <li class="check">Add pagination, caching, and JWT to your main project</li>
+              <li class="check">Write a README with architecture diagram</li>
+              <li class="check">Resume: 4 bullet points per project with metrics</li>
+              <li class="check">LeetCode: 3 medium problems/day, timed (30 min each)</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Week 8 — Full Mock + HR Prep</div>
+            <ul class="item-list">
+              <li class="check">2 full mock interviews (technical + system design)</li>
+              <li class="check">Behavioral: STAR stories for top 10 HR questions</li>
+              <li class="check">Revise Top 50 questions (see Top 50 tab)</li>
+              <li class="check">Apply to 10+ companies — shortlist by target band</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORE JAVA -->
+  <div class="panel" id="panel-core">
+    <div class="phase-grid">
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-purple">A</span>
+          <span class="week-title">OOP & Java Internals</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>90% of mid-level interviews test OOP with scenario-based questions, not definitions.</p></div>
+          <div class="section-block">
+            <div class="section-label">What to study</div>
+            <ul class="item-list">
+              <li>Polymorphism: runtime vs compile-time, method hiding vs overriding</li>
+              <li>Abstract class vs Interface (Java 8+ default methods)</li>
+              <li>Immutability: String pool, how to design immutable class</li>
+              <li>equals/hashCode contract — broken HashMap behavior</li>
+              <li>final, static, transient — real usage</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Interview questions</div>
+            <div class="q-list">
+              <div class="q-item">Why is String immutable in Java? What's the benefit?</div>
+              <div class="q-item">Can you override a static method? What happens if you try?</div>
+              <div class="q-item">Design an immutable class with a mutable field (e.g., a list).</div>
+              <div class="q-item">If I put a mutable object as a HashMap key and change it — what happens?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-purple">B</span>
+          <span class="week-title">Collections & Generics</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>HashMap internals are the #1 asked topic. Know load factor, rehashing, TreeNode at threshold 8.</p></div>
+          <div class="section-block">
+            <div class="section-label">What to study</div>
+            <ul class="item-list">
+              <li>HashMap: internal hashing, put/get, collision resolution, Java 8 treeification</li>
+              <li>ConcurrentHashMap vs Hashtable vs Collections.synchronizedMap</li>
+              <li>ArrayList vs LinkedList — when to use each (be specific)</li>
+              <li>Comparable vs Comparator</li>
+              <li>Generics: bounded wildcards (? extends T, ? super T), type erasure</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Interview questions</div>
+            <div class="q-list">
+              <div class="q-item">How does HashMap handle collisions internally in Java 8?</div>
+              <div class="q-item">When would you pick LinkedHashMap over HashMap?</div>
+              <div class="q-item">What's the difference between fail-fast and fail-safe iterators?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-purple">C</span>
+          <span class="week-title">Multithreading & Concurrency</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>Asked heavily at product companies. Focus on practical patterns, not theory.</p></div>
+          <div class="section-block">
+            <div class="section-label">What to study</div>
+            <ul class="item-list">
+              <li>Thread vs Runnable vs Callable vs Future</li>
+              <li>ExecutorService, ThreadPoolExecutor, ForkJoinPool</li>
+              <li>synchronized vs Lock, ReentrantLock, ReadWriteLock</li>
+              <li>volatile — visibility guarantee, why not atomicity</li>
+              <li>Deadlock: cause, detection, prevention strategies</li>
+              <li>CompletableFuture: thenApply, thenCompose, allOf</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Interview questions</div>
+            <div class="q-list">
+              <div class="q-item">Implement a thread-safe Singleton using double-checked locking.</div>
+              <div class="q-item">What is a race condition? Show a code example and fix it.</div>
+              <div class="q-item">Difference between wait() and sleep()? Why is wait() inside synchronized?</div>
+              <div class="q-item">How would you implement a producer-consumer without using BlockingQueue?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-purple">D</span>
+          <span class="week-title">Java 8–17 Features</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>Streams are a must. If you can't write stream pipelines fluently, you look junior.</p></div>
+          <div class="section-block">
+            <div class="section-label">What to study</div>
+            <ul class="item-list">
+              <li>Stream: map, filter, reduce, collect, flatMap, distinct, sorted, limit</li>
+              <li>Collectors: groupingBy, partitioningBy, toMap, joining</li>
+              <li>Optional: correct usage, avoid null checks</li>
+              <li>Functional interfaces: Predicate, Function, Consumer, Supplier, BiFunction</li>
+              <li>Method references: types (static, instance, constructor)</li>
+              <li>Record classes, var, sealed classes (Java 14–17)</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Interview questions</div>
+            <div class="q-list">
+              <div class="q-item">Group a list of employees by department and find the max salary in each group using streams.</div>
+              <div class="q-item">What is the difference between map() and flatMap()?</div>
+              <div class="q-item">When would you NOT use Optional? What are its pitfalls?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPRING BOOT -->
+  <div class="panel" id="panel-spring">
+    <div class="phase-grid">
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-teal">E</span>
+          <span class="week-title">Spring Core & Boot Internals</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>Interviewers test "what happens under the hood," not just @Autowired usage.</p></div>
+          <div class="section-block">
+            <div class="section-label">What to study</div>
+            <ul class="item-list">
+              <li>IOC container, BeanFactory vs ApplicationContext</li>
+              <li>Bean scopes: Singleton, Prototype, Request, Session</li>
+              <li>@Component, @Service, @Repository, @Controller — differences</li>
+              <li>Auto-configuration: how @SpringBootApplication works</li>
+              <li>@Transactional: propagation levels, isolation, rollback rules</li>
+              <li>AOP: @Aspect, @Around, @Before — practical logging/timing use case</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Interview questions</div>
+            <div class="q-list">
+              <div class="q-item">What's the difference between @Component and @Bean?</div>
+              <div class="q-item">Explain @Transactional propagation: REQUIRED vs REQUIRES_NEW.</div>
+              <div class="q-item">How would you handle circular dependency in Spring?</div>
+              <div class="q-item">What happens if you call a @Transactional method from within the same class?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-teal">F</span>
+          <span class="week-title">REST APIs, Security & JPA</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>Almost every real project uses JPA + REST + JWT. This is the bread and butter of the interview.</p></div>
+          <div class="section-block">
+            <div class="section-label">What to study</div>
+            <ul class="item-list">
+              <li>REST best practices: HTTP verbs, status codes, idempotency</li>
+              <li>@ControllerAdvice, @ExceptionHandler for global error handling</li>
+              <li>Spring Security: filter chain, JWT validation, custom UserDetailsService</li>
+              <li>JPA: N+1 problem (fix with JOIN FETCH or @EntityGraph), lazy loading pitfalls</li>
+              <li>Pagination, sorting with Spring Data (Pageable)</li>
+              <li>@Query with JPQL vs native SQL</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Interview questions</div>
+            <div class="q-list">
+              <div class="q-item">Explain the N+1 query problem. How do you diagnose and fix it?</div>
+              <div class="q-item">How does JWT authentication work in a Spring Boot filter chain?</div>
+              <div class="q-item">What's the difference between @OneToMany with EAGER vs LAZY?</div>
+              <div class="q-item">How would you design a global exception handler for your REST API?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-teal">G</span>
+          <span class="week-title">Microservices Patterns</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>If the JD says "microservices," you'll be asked these. Know patterns by name and code.</p></div>
+          <div class="section-block">
+            <div class="section-label">What to study</div>
+            <ul class="item-list">
+              <li>Service discovery: Eureka, Consul (how registration/heartbeat works)</li>
+              <li>API Gateway: Spring Cloud Gateway — routing, filters, rate limiting</li>
+              <li>Feign client: declarative REST calls, fallback</li>
+              <li>Circuit breaker: Resilience4j — states (CLOSED/OPEN/HALF_OPEN)</li>
+              <li>Distributed tracing: Micrometer + Zipkin/Jaeger</li>
+              <li>Event-driven: Kafka basics — producer, consumer, consumer groups, offset management</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Interview questions</div>
+            <div class="q-list">
+              <div class="q-item">How do you handle partial failure when calling 3 downstream services?</div>
+              <div class="q-item">What is a circuit breaker? Walk through the state transitions.</div>
+              <div class="q-item">How do you maintain data consistency across microservices without distributed transactions?</div>
+              <div class="q-item">What is the SAGA pattern? Choreography vs orchestration?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DSA -->
+  <div class="panel" id="panel-dsa">
+    <div class="phase-grid">
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-blue">H</span>
+          <span class="week-title">Core Patterns to Master</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>At 3 YoE, you won't face hard DP. Focus on medium-level patterns — these cover 80% of questions asked.</p></div>
+          <div class="section-block">
+            <div class="section-label">Must-know patterns (in priority order)</div>
+            <ul class="item-list">
+              <li><strong>Two pointers</strong> — sorted arrays, pair sum, palindrome checks</li>
+              <li><strong>Sliding window</strong> — max subarray, longest substring without repeat</li>
+              <li><strong>HashMap patterns</strong> — frequency count, anagram grouping, subarray sum</li>
+              <li><strong>Binary search</strong> — on sorted array + on answer space (capacity, days)</li>
+              <li><strong>Stack patterns</strong> — monotonic stack (next greater element, histogram area)</li>
+              <li><strong>BFS/DFS</strong> — graphs, trees, island counting, shortest path</li>
+              <li><strong>Linked list</strong> — reverse, detect cycle (Floyd), merge sorted lists</li>
+              <li><strong>Recursion + Memoization</strong> — basic DP (knapsack, coin change, LCS)</li>
+              <li><strong>Tree traversals</strong> — level order, zigzag, lowest common ancestor</li>
+              <li><strong>Heap (PriorityQueue)</strong> — top K elements, merge K sorted lists</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">LeetCode target list (solve 80–100 problems)</div>
+            <ul class="item-list">
+              <li>Two Sum, 3Sum, Container with Most Water, Trapping Rain Water</li>
+              <li>Longest Substring Without Repeating Characters, Minimum Window Substring</li>
+              <li>Binary Search, Search in Rotated Array, Find Peak Element</li>
+              <li>Valid Parentheses, Daily Temperatures, Next Greater Element</li>
+              <li>Number of Islands, Word Ladder, Clone Graph</li>
+              <li>LRU Cache (LinkedHashMap or custom), Median of Data Stream</li>
+              <li>Coin Change, Longest Common Subsequence, House Robber</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Daily DSA routine</div>
+            <ul class="item-list">
+              <li>1 easy (warm-up) + 1–2 mediums — 45–60 min total</li>
+              <li>After solving, check top solution on LeetCode Discuss</li>
+              <li>Maintain a "patterns journal" — one line per problem with the pattern used</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SQL -->
+  <div class="panel" id="panel-sql">
+    <div class="phase-grid">
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-amber">I</span>
+          <span class="week-title">SQL Queries & Window Functions</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>Window functions separate seniors from juniors in SQL rounds. Master these.</p></div>
+          <div class="section-block">
+            <div class="section-label">What to study</div>
+            <ul class="item-list">
+              <li>All JOIN types — INNER, LEFT, RIGHT, FULL OUTER, CROSS, SELF</li>
+              <li>Subqueries vs CTEs (WITH clause) — readability + performance</li>
+              <li>Window functions: ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, SUM/AVG OVER PARTITION</li>
+              <li>GROUP BY with HAVING — filter on aggregates</li>
+              <li>NULL handling: COALESCE, NULLIF, IS NULL vs = NULL</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Interview questions</div>
+            <div class="q-list">
+              <div class="q-item">Find the second-highest salary in each department.</div>
+              <div class="q-item">Find employees who earn more than their manager.</div>
+              <div class="q-item">Get the running total of sales by date using window functions.</div>
+              <div class="q-item">Find duplicate rows and delete all but one.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-amber">J</span>
+          <span class="week-title">Indexes, Optimization & Transactions</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>Performance tuning questions are extremely common at product companies where query speed matters.</p></div>
+          <div class="section-block">
+            <div class="section-label">What to study</div>
+            <ul class="item-list">
+              <li>Index types: B-tree, hash, composite, covering index</li>
+              <li>When NOT to index (high write, low cardinality, small tables)</li>
+              <li>EXPLAIN ANALYZE — reading query plan, identifying full table scans</li>
+              <li>ACID: Atomicity, Consistency, Isolation, Durability — real examples</li>
+              <li>Isolation levels: READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, SERIALIZABLE</li>
+              <li>Deadlock detection and resolution strategies</li>
+              <li>Indexing composite columns: column order matters (leftmost prefix rule)</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Interview questions</div>
+            <div class="q-list">
+              <div class="q-item">A query on a 10M row table is slow. What is your step-by-step debug approach?</div>
+              <div class="q-item">You have an index on (A, B, C). Does a query filtering on B and C use the index?</div>
+              <div class="q-item">What is a phantom read? Which isolation level prevents it?</div>
+              <div class="q-item">When would you prefer a NoSQL database over a relational one?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYSTEM DESIGN -->
+  <div class="panel" id="panel-system">
+    <div class="phase-grid">
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-coral">K</span>
+          <span class="week-title">Core Building Blocks</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>At 3 YoE, you need to demonstrate structured thinking, not perfect answers. Learn the vocabulary.</p></div>
+          <div class="section-block">
+            <div class="section-label">Essential concepts</div>
+            <ul class="item-list">
+              <li>Load balancing: round-robin, least connections, consistent hashing</li>
+              <li>Caching: Redis, cache-aside, write-through, TTL, eviction (LRU)</li>
+              <li>CDN: static asset delivery, edge caching</li>
+              <li>Message queues: Kafka vs RabbitMQ — use cases, ordering guarantees</li>
+              <li>Database sharding: horizontal partitioning strategies</li>
+              <li>SQL vs NoSQL: when each — Cassandra for time-series, MongoDB for docs</li>
+              <li>CAP theorem: trade-offs in distributed systems</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-coral">L</span>
+          <span class="week-title">Must-Practice Designs</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="section-block">
+            <div class="section-label">Design these end-to-end (30 min each, practice out loud)</div>
+            <ul class="item-list">
+              <li>URL shortener (hashing, redirect, analytics, DB choice)</li>
+              <li>Rate limiter (token bucket, sliding window, Redis implementation)</li>
+              <li>Notification system (email/SMS/push, fan-out, delivery guarantees)</li>
+              <li>E-commerce product search (indexing, Elasticsearch, filters)</li>
+              <li>Chat system (WebSocket, message storage, delivery receipts)</li>
+              <li>Payment processing (idempotency, saga, retries)</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Framework for every design question</div>
+            <ul class="item-list">
+              <li>1. Clarify requirements (2 min) — scale, users, features, constraints</li>
+              <li>2. Estimate scale — requests/sec, storage, bandwidth</li>
+              <li>3. High-level diagram — services, DB, cache, queue</li>
+              <li>4. Deep dive on 1–2 components the interviewer picks</li>
+              <li>5. Discuss trade-offs and bottlenecks</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Resources</div>
+            <div class="res-list">
+              <span class="res-item" onclick="openLink('https://bytebytego.com')">ByteByteGo — System Design Interview (Alex Xu) — best for 3 YoE</span>
+              <span class="res-item" onclick="openLink('https://github.com/donnemartin/system-design-primer')">System Design Primer (GitHub) — free, comprehensive</span>
+              <span class="res-item" onclick="openLink('https://youtube.com/@GOTO-')">Gaurav Sen YouTube — Microservices & HLD</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LLD -->
+  <div class="panel" id="panel-lld">
+    <div class="phase-grid">
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-green">M</span>
+          <span class="week-title">SOLID Principles in Java</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="why-box"><p>Know how to apply, not just define. Show code examples in Java.</p></div>
+          <div class="section-block">
+            <div class="section-label">SOLID — with Java violations and fixes</div>
+            <ul class="item-list">
+              <li>SRP: One reason to change — split UserService from EmailService</li>
+              <li>OCP: Open for extension, closed for modification — use Strategy pattern</li>
+              <li>LSP: Subclass must not break parent behavior — Rectangle vs Square trap</li>
+              <li>ISP: Prefer small interfaces — split Flyable, Swimmable from Animal</li>
+              <li>DIP: Depend on abstractions — inject Repository interface, not concrete class</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Design patterns to master (with Java code)</div>
+            <ul class="item-list">
+              <li>Singleton — thread-safe lazy init (enum approach)</li>
+              <li>Factory + Abstract Factory — object creation without tight coupling</li>
+              <li>Builder — complex object construction (used everywhere in Spring)</li>
+              <li>Strategy — replace if-else chains with polymorphism</li>
+              <li>Observer — event listeners, pub-sub</li>
+              <li>Decorator — wrapping behavior (InputStream hierarchy)</li>
+              <li>Template Method — define skeleton, subclass fills steps</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">LLD Design Practice problems</div>
+            <ul class="item-list">
+              <li>Parking lot (levels, vehicle types, ticketing, fees)</li>
+              <li>Library management system (book, member, issue, return)</li>
+              <li>Chess game (board, pieces, rules, player)</li>
+              <li>Food delivery (restaurant, rider, order, status FSM)</li>
+              <li>ATM machine (PIN, balance, withdraw, card states)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECTS & RESUME -->
+  <div class="panel" id="panel-projects">
+    <div class="phase-grid">
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-gray">N</span>
+          <span class="week-title">Projects that stand out</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="highlight-box"><p><strong>Rule:</strong> 1 strong project beats 5 basic CRUD apps. Add depth: async processing, caching, auth, pagination, monitoring.</p></div>
+          <div class="section-block">
+            <div class="section-label">Build one of these (with full stack)</div>
+            <ul class="item-list">
+              <li>E-commerce backend — product catalog, cart, order, inventory, payment (Stripe/Razorpay simulation)</li>
+              <li>Task management API — real-time updates via WebSocket, role-based access, audit logs</li>
+              <li>URL shortener — custom alias, analytics, Redis caching, rate limiting per user</li>
+              <li>Job portal microservices — 3+ services (user, job, notification), Kafka between them, Docker Compose</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Must-haves in every project</div>
+            <ul class="item-list">
+              <li>JWT authentication + role-based authorization</li>
+              <li>Global exception handling (proper HTTP status codes)</li>
+              <li>Pagination, filtering, sorting via Spring Data</li>
+              <li>Redis caching on at least one endpoint</li>
+              <li>Unit tests (JUnit 5 + Mockito) — min 60% coverage</li>
+              <li>README with architecture diagram + setup instructions</li>
+              <li>Deployed on Railway/Render or Dockerized</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-card">
+        <div class="week-header" onclick="toggle(this)">
+          <span class="week-badge badge-gray">O</span>
+          <span class="week-title">Resume optimization</span>
+          <span class="week-toggle">▶</span>
+        </div>
+        <div class="week-body">
+          <div class="section-block">
+            <div class="section-label">Resume rules for 8–15 LPA roles</div>
+            <ul class="item-list">
+              <li>1 page only. No photo, no "Objective" section.</li>
+              <li>Each bullet: Action verb + What you did + Result/metric</li>
+              <li>Bad: "Worked on backend APIs" → Good: "Built 12 REST APIs for order management; reduced avg latency by 35% with Redis caching"</li>
+              <li>Skills section: Java, Spring Boot, Hibernate, MySQL, Redis, Kafka, Docker, Git — no "MS Word"</li>
+              <li>Projects: Name, tech stack in brackets, 3 bullet points with impact</li>
+              <li>Use ATS-friendly format (no tables, columns, graphics)</li>
+            </ul>
+          </div>
+          <hr class="divider">
+          <div class="section-block">
+            <div class="section-label">Behavioral prep — STAR format</div>
+            <ul class="item-list">
+              <li>Tell me about yourself — 90-second pitch: current role → what you built → why you're looking</li>
+              <li>Biggest challenge — use a real technical problem, explain your debugging process</li>
+              <li>Conflict with a colleague — focus on resolution, not blame</li>
+              <li>Greatest achievement — tie it to business impact, not just code</li>
+              <li>Why this company — research 2–3 specific things about their tech stack</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP 50 -->
+  <div class="panel" id="panel-top50">
+    <div class="highlight-box">
+      <p><strong>Quick-revision checklist</strong> — these 50 questions cover 70%+ of what's asked at 8–15 LPA interviews. Review all before each interview.</p>
+    </div>
+    <div class="top50-grid">
+      <div class="q50-card">
+        <div class="q50-head" style="background: var(--purple-50); color: var(--purple-800);">Core Java (10)</div>
+        <div class="q50-body">
+          <div class="q50-item"><span class="q50-num">1.</span>String vs StringBuilder vs StringBuffer</div>
+          <div class="q50-item"><span class="q50-num">2.</span>How HashMap works internally in Java 8</div>
+          <div class="q50-item"><span class="q50-num">3.</span>volatile vs synchronized</div>
+          <div class="q50-item"><span class="q50-num">4.</span>Design a thread-safe Singleton</div>
+          <div class="q50-item"><span class="q50-num">5.</span>equals() and hashCode() contract</div>
+          <div class="q50-item"><span class="q50-num">6.</span>CompletableFuture chaining (thenApply vs thenCompose)</div>
+          <div class="q50-item"><span class="q50-num">7.</span>Stream: map vs flatMap with example</div>
+          <div class="q50-item"><span class="q50-num">8.</span>Abstract class vs Interface (Java 8+)</div>
+          <div class="q50-item"><span class="q50-num">9.</span>How to design an immutable class</div>
+          <div class="q50-item"><span class="q50-num">10.</span>ConcurrentHashMap vs Collections.synchronizedMap</div>
+        </div>
+      </div>
+
+      <div class="q50-card">
+        <div class="q50-head" style="background: var(--teal-50); color: var(--teal-800);">Spring Boot (10)</div>
+        <div class="q50-body">
+          <div class="q50-item"><span class="q50-num">11.</span>Spring Bean lifecycle — all callbacks</div>
+          <div class="q50-item"><span class="q50-num">12.</span>@Transactional propagation: REQUIRED vs REQUIRES_NEW</div>
+          <div class="q50-item"><span class="q50-num">13.</span>N+1 problem in JPA and fix</div>
+          <div class="q50-item"><span class="q50-num">14.</span>How JWT auth filter works in Spring Security</div>
+          <div class="q50-item"><span class="q50-num">15.</span>Circular dependency in Spring — cause and fix</div>
+          <div class="q50-item"><span class="q50-num">16.</span>Lazy vs Eager loading — when each causes issues</div>
+          <div class="q50-item"><span class="q50-num">17.</span>Circuit breaker state machine (Resilience4j)</div>
+          <div class="q50-item"><span class="q50-num">18.</span>@Transactional on private method — works?</div>
+          <div class="q50-item"><span class="q50-num">19.</span>SAGA pattern — choreography vs orchestration</div>
+          <div class="q50-item"><span class="q50-num">20.</span>How to test a Spring Boot REST endpoint (MockMvc)</div>
+        </div>
+      </div>
+
+      <div class="q50-card">
+        <div class="q50-head" style="background: var(--amber-50); color: var(--amber-800);">SQL & DB (10)</div>
+        <div class="q50-body">
+          <div class="q50-item"><span class="q50-num">21.</span>2nd highest salary per department</div>
+          <div class="q50-item"><span class="q50-num">22.</span>Composite index — column order and leftmost prefix rule</div>
+          <div class="q50-item"><span class="q50-num">23.</span>EXPLAIN ANALYZE — what to look for</div>
+          <div class="q50-item"><span class="q50-num">24.</span>Phantom read — isolation level that prevents it</div>
+          <div class="q50-item"><span class="q50-num">25.</span>ROW_NUMBER vs RANK vs DENSE_RANK</div>
+          <div class="q50-item"><span class="q50-num">26.</span>Deadlock: cause, detection, resolution</div>
+          <div class="q50-item"><span class="q50-num">27.</span>SQL vs NoSQL — pick one for given scenario</div>
+          <div class="q50-item"><span class="q50-num">28.</span>CTE vs subquery — performance trade-offs</div>
+          <div class="q50-item"><span class="q50-num">29.</span>Find and delete duplicate rows</div>
+          <div class="q50-item"><span class="q50-num">30.</span>When would you NOT add an index?</div>
+        </div>
+      </div>
+
+      <div class="q50-card">
+        <div class="q50-head" style="background: var(--coral-50); color: var(--coral-800);">System Design (10)</div>
+        <div class="q50-body">
+          <div class="q50-item"><span class="q50-num">31.</span>Design a URL shortener end-to-end</div>
+          <div class="q50-item"><span class="q50-num">32.</span>Design a rate limiter — token bucket vs sliding window</div>
+          <div class="q50-item"><span class="q50-num">33.</span>Consistent hashing — what problem does it solve</div>
+          <div class="q50-item"><span class="q50-num">34.</span>Cache invalidation strategies</div>
+          <div class="q50-item"><span class="q50-num">35.</span>Kafka vs RabbitMQ — when to use each</div>
+          <div class="q50-item"><span class="q50-num">36.</span>How to handle 10M concurrent users — where to start</div>
+          <div class="q50-item"><span class="q50-num">37.</span>CAP theorem — real examples of each trade-off</div>
+          <div class="q50-item"><span class="q50-num">38.</span>Database sharding strategies</div>
+          <div class="q50-item"><span class="q50-num">39.</span>Design a notification system for 100M users</div>
+          <div class="q50-item"><span class="q50-num">40.</span>Idempotency in payment APIs — how to achieve</div>
+        </div>
+      </div>
+
+      <div class="q50-card" style="grid-column: 1 / -1;">
+        <div class="q50-head" style="background: var(--green-50); color: var(--green-800);">LLD + Behavioral (10)</div>
+        <div class="q50-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px 16px;">
+          <div class="q50-item"><span class="q50-num">41.</span>Design a parking lot (LLD — class diagram + code)</div>
+          <div class="q50-item"><span class="q50-num">42.</span>Strategy pattern vs if-else — when to refactor</div>
+          <div class="q50-item"><span class="q50-num">43.</span>SOLID violations in legacy code — identify and fix</div>
+          <div class="q50-item"><span class="q50-num">44.</span>Builder vs Constructor — when Builder wins</div>
+          <div class="q50-item"><span class="q50-num">45.</span>Observer pattern — real use case in Java events</div>
+          <div class="q50-item"><span class="q50-num">46.</span>Tell me about yourself — 90-second pitch</div>
+          <div class="q50-item"><span class="q50-num">47.</span>Most challenging technical problem you solved</div>
+          <div class="q50-item"><span class="q50-num">48.</span>How do you handle disagreement with tech lead?</div>
+          <div class="q50-item"><span class="q50-num">49.</span>Where do you see yourself in 2–3 years?</div>
+          <div class="q50-item"><span class="q50-num">50.</span>Why are you leaving your current company?</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRATEGY -->
+  <div class="panel" id="panel-strategy">
+    <div class="section-block" style="margin-bottom: 1.5rem;">
+      <div class="section-label" style="margin-bottom: 12px;">Daily study plan (2–3 hours/day)</div>
+      <div class="daily-grid">
+        <div class="time-card">
+          <div class="time-slot">Hour 1</div>
+          <div class="time-activity">DSA / Coding</div>
+          <div class="time-detail">1 easy warm-up + 1–2 medium LeetCode problems (timed, 25 min each)</div>
+        </div>
+        <div class="time-card">
+          <div class="time-slot">Hour 2</div>
+          <div class="time-activity">Core topic</div>
+          <div class="time-detail">Study that week's topic (Core Java / Spring / SQL / System Design) — active recall, not passive reading</div>
+        </div>
+        <div class="time-card">
+          <div class="time-slot">Hour 3</div>
+          <div class="time-activity">Apply / Review</div>
+          <div class="time-detail">Write code, answer 2 interview questions from memory, or watch one 20-min video on the topic</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block" style="margin-bottom: 1.5rem;">
+      <div class="section-label" style="margin-bottom: 12px;">Mock interview strategy</div>
+      <div class="tip-row">
+        <div class="tip-card">
+          <h4>Week 4 — Start mocks early</h4>
+          <ul>
+            <li>Use Pramp or interviewing.io for free peer mocks</li>
+            <li>Record yourself explaining — watch for clarity and filler words</li>
+            <li>Do at least 1 mock/week from Week 4 onward</li>
+          </ul>
+        </div>
+        <div class="tip-card">
+          <h4>Technical round framework</h4>
+          <ul>
+            <li>DSA: Think out loud, start brute force, optimize step by step</li>
+            <li>System Design: Clarify → Estimate → Diagram → Deep dive → Trade-offs</li>
+            <li>Ask clarifying questions — shows seniority</li>
+          </ul>
+        </div>
+        <div class="tip-card">
+          <h4>Negotiation tips</h4>
+          <ul>
+            <li>Never give a number first — ask for their range</li>
+            <li>Get competing offers if possible — real leverage</li>
+            <li>Negotiate base, bonus, stock separately</li>
+            <li>Know your BATNA before any offer call</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label" style="margin-bottom: 12px;">Recommended resources</div>
+      <div class="phase-grid">
+        <div class="week-card">
+          <div class="week-header" onclick="toggle(this)">
+            <span class="week-badge badge-purple">Free resources</span>
+            <span class="week-title">Best free study material</span>
+            <span class="week-toggle">▶</span>
+          </div>
+          <div class="week-body">
+            <ul class="item-list">
+              <li>LeetCode — DSA practice (free tier is enough)</li>
+              <li>Neetcode.io — curated 150 problems with video solutions</li>
+              <li>System Design Primer (GitHub) — comprehensive HLD notes</li>
+              <li>Gaurav Sen YouTube — microservices, system design</li>
+              <li>Defog.tech YouTube — Java + Spring Boot deep dives</li>
+              <li>Spring official docs — spring.io (most accurate source)</li>
+              <li>SQLZoo / LeetCode SQL 50 — SQL practice</li>
+            </ul>
+          </div>
+        </div>
+        <div class="week-card">
+          <div class="week-header" onclick="toggle(this)">
+            <span class="week-badge badge-teal">Paid (optional)</span>
+            <span class="week-title">Worth buying if budget allows</span>
+            <span class="week-toggle">▶</span>
+          </div>
+          <div class="week-body">
+            <ul class="item-list">
+              <li>ByteByteGo (Alex Xu) — System Design Interview Vol 1 & 2</li>
+              <li>Educative.io — Grokking System Design + LLD courses</li>
+              <li>Udemy — Java Multithreading by Heinz Kabutz (advanced)</li>
+              <li>LeetCode Premium — company-specific question lists</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggle(header) {
+    const body = header.nextElementSibling;
+    const arrow = header.querySelector('.week-toggle');
+    body.classList.toggle('open');
+    arrow.classList.toggle('open');
+  }
+
+  document.getElementById('tabs').addEventListener('click', e => {
+    const tab = e.target.closest('.tab');
+    if (!tab) return;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+
+  function openLink(url) {
+    window.open(url, '_blank');
+  }
+</script>
